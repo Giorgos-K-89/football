@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Football Runner</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="gameStartDiv" class="gameUI">
+      <h1>
+        Football <br />
+        Runner
+      </h1>
+      <button id="gameStartBtn" class="primaryBtn">START</button>
+      <p class="signature">
+        Created by <img class="yolt-logo" src="/assets/yoltlabs-logo.png" />
+      </p>
+    </div>
+    <div id="gameEndDiv" class="gameUI">
+      <p>Game Over</p>
+      <h1>You <span id="gameWinLoseSpan"></span></h1>
+      <button id="gameRestartBtn" class="primaryBtn">PLAY AGAIN</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/phaser/dist/phaser.js"></script>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
