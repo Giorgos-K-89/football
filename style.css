@@ -13,8 +13,10 @@
 
 body {
   height: 100vh;
+  background-image: url(assets/cover.jpg);
+  background-position: center;
+  backdrop-filter: brightness(0.4);
   margin: 0;
-  background: var(--dark);
   color: var(--light);
   display: flex;
   align-items: center;
@@ -22,11 +24,12 @@ body {
 }
 
 h1 {
+  font-family: "Luckiest Guy", cursive;
   font-size: 4rem;
   text-align: center;
+  letter-spacing: 4px;
   font-weight: 900;
-  color: yellow;
-  text-shadow: 4px 4px red;
+  text-shadow: 0px 0px 20px black;
   animation: upDown 4s ease infinite;
 }
 
@@ -45,7 +48,7 @@ h1 {
 .signature {
   position: absolute;
   bottom: 10px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -66,7 +69,6 @@ canvas {
 }
 
 .gameUI {
-  background: #0e0e0e;
   position: relative;
   width: 1000px;
   height: 700px;
@@ -103,4 +105,16 @@ canvas {
   border: 1px solid var(--light);
   color: var(--light);
   cursor: pointer;
+}
+
+#gameWinLoseSpan {
+  font-family: "Luckiest Guy", cursive;
+}
+
+#gameWinLoseReason {
+  color: yellow;
+  text-shadow: 0px 0px 10px black;
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 2rem;
 }

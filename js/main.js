@@ -5,7 +5,7 @@ const gameStartBtn = document.getElementById("gameStartBtn");
 const gameEndDiv = document.getElementById("gameEndDiv");
 const gameRestartBtn = document.getElementById("gameRestartBtn");
 const gameWinLoseSpan = document.getElementById("gameWinLoseSpan");
-const gameEndScore = document.getElementById("gameEndScoreSpan");
+const gameWinLoseReason = document.getElementById("gameWinLoseReason");
 const canvas = document.getElementById("gameCanvas");
 
 let game = null;
@@ -19,7 +19,8 @@ gameStartBtn.addEventListener("click", () => {
 gameRestartBtn.addEventListener("click", () => {
   gameEndDiv.style.display = "none";
   canvas.style.display = "flex";
+  game.scene.keys["FieldPreviewScene"].scene.restart();
 });
 
 // Expose DOM elements so scenes can call them
-export { gameEndDiv, gameWinLoseSpan, gameEndScore, canvas };
+export { gameEndDiv, gameWinLoseSpan, gameWinLoseReason, canvas };

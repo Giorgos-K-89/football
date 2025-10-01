@@ -9,22 +9,15 @@ export default class FieldPreviewScene extends Phaser.Scene {
   }
 
   init() {
-    // Scene state
     this.gameOver = false;
-    this.cameraAtTop = false;
-
-    // World dimensions
     this.worldHeight = 0;
     this.worldWidth = 0;
-
-    // Field data
     this.fieldData = null;
 
     // Camera settings
     this.cameraSettings = {
-      runSpeed: 220, // px/sec - how fast camera moves up
-      playerBottomOffset: 200, // px from bottom of screen
-      followLerpX: 0.12,
+      runSpeed: 220,
+      playerBottomOffset: 200,
     };
 
     // Game entities
@@ -32,17 +25,14 @@ export default class FieldPreviewScene extends Phaser.Scene {
     this.opponents = null;
     this.keeper = null;
 
-    // Target shooting position
+    // Shooting target
     this.shootingTarget = {
       x: 0,
       y: 0,
-      tolerance: 8,
       isSet: false,
     };
 
-    // Input
     this.cursors = null;
-    this.spaceKey = null;
   }
 
   preload() {
@@ -50,17 +40,6 @@ export default class FieldPreviewScene extends Phaser.Scene {
     this.load.image("player1", "assets/player1-1.png");
     this.load.image("player2", "assets/player1-2.png");
     this.load.image("shoot1", "assets/shoot1-1.png");
-    this.load.image("shoot2", "assets/shoot1-2.png");
-
-    // Game assets
-    this.load.image("ball", "assets/ball.png");
-    this.load.video(
-      "ballkickingVideo",
-      "assets/cropedfootball.mp4",
-      "loaded",
-      false,
-      true
-    );
 
     // Opponent assets
     this.load.image("opponent1", "assets/opponent1-1.png");
@@ -68,7 +47,7 @@ export default class FieldPreviewScene extends Phaser.Scene {
     this.load.image("keeper1", "assets/keeper1-1.png");
     this.load.image("keeper2", "assets/keeper1-2.png");
 
-    //fans
+    // Fans
     this.load.image("fan_0", "assets/fan_0.png");
     this.load.image("fan_1", "assets/fan_1.png");
     this.load.image("fan_2", "assets/fan_2.png");
@@ -82,8 +61,8 @@ export default class FieldPreviewScene extends Phaser.Scene {
     this.createPlayer();
     this.createOpponents();
     this.setupInput();
-    // this.setupUI();
     this.setShootingTarget();
+    this.preloadShootSceneAssets();
   }
 
   setupWorld() {
@@ -98,16 +77,11 @@ export default class FieldPreviewScene extends Phaser.Scene {
       height: this.sys.game.config.height,
       worldHeight: this.worldHeight,
       worldWidth: this.worldWidth,
-      pad: 48,
-      paddingPercentage: 0.1, // 10% padding
+      paddingPercentage: 0.1,
       textureKey: "fieldFull",
-      showZones: true,
     });
 
-    // Add field image
     this.add.image(0, 0, "fieldFull").setOrigin(0, 0).setDepth(0);
-
-    // Create goal nets
     this.createNets();
   }
 
@@ -146,7 +120,7 @@ export default class FieldPreviewScene extends Phaser.Scene {
 
   setupCamera() {
     const cam = this.cameras.main;
-    cam.setBounds(0, 0, this.worldWidth, this.worldHeight * 0.85); // starting camera at 85% of world height so i dont show the bottom part
+    cam.setBounds(0, 0, this.worldWidth, this.worldHeight * 0.85);
     cam.setZoom(1);
 
     // Start at bottom of field
@@ -155,7 +129,6 @@ export default class FieldPreviewScene extends Phaser.Scene {
       this.worldHeight - this.sys.game.config.height / 2
     );
 
-    // Setup physics world
     this.physics.world.setBounds(0, 0, this.worldWidth, this.worldHeight);
   }
 
@@ -172,7 +145,6 @@ export default class FieldPreviewScene extends Phaser.Scene {
       shootFrame: "shoot1",
     });
 
-    // Start camera following player
     this.cameras.main.startFollow(this.player, false, 0.12, 0);
   }
 
@@ -187,14 +159,12 @@ export default class FieldPreviewScene extends Phaser.Scene {
     this.opponents = players.opponentsGroup;
     this.keeper = players.keeper;
 
-    // Set depths
     this.opponents.getChildren().forEach((opponent) => opponent.setDepth(40));
     if (this.keeper) this.keeper.setDepth(230);
 
-    // Setup collision
     this.physics.add.overlap(
-      this.opponents,
       this.player,
+      this.opponents,
       this.handlePlayerHit,
       null,
       this
@@ -203,12 +173,7 @@ export default class FieldPreviewScene extends Phaser.Scene {
 
   setupInput() {
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.spaceKey = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.SPACE
-    );
     this.player.enableInput(this.cursors);
-
-    // Setup keyboard shortcuts
     this.setupKeyboardShortcuts();
   }
 
@@ -232,24 +197,29 @@ export default class FieldPreviewScene extends Phaser.Scene {
   }
 
   setShootingTarget() {
-    this.shootingTarget.x = this.worldWidth / 2; // Center of field
-    this.shootingTarget.y = this.fieldData.goalLineTopY + 250; // 250px from goal
+    this.shootingTarget.x = this.worldWidth / 2;
+    this.shootingTarget.y = this.fieldData.goalLineTopY + 250;
     this.shootingTarget.isSet = true;
+  }
 
-    console.log(
-      `Shooting target: (${this.shootingTarget.x}, ${this.shootingTarget.y})`
+  preloadShootSceneAssets() {
+    this.load.video(
+      "ballkickingVideo",
+      "assets/cropedfootball.mp4",
+      "loaded",
+      false,
+      true
     );
+    this.load.start();
   }
 
   update(time, delta) {
     if (this.gameOver) return;
 
-    // Update player
     if (this.player) {
       this.player.update(time, delta);
     }
 
-    // Skip other updates if ready to shoot or shot taken
     if (this.player?.isReady()) return;
 
     this.updateCameraMovement(delta);
@@ -260,7 +230,7 @@ export default class FieldPreviewScene extends Phaser.Scene {
 
   updateCameraMovement(delta) {
     const cam = this.cameras.main;
-    const maxScrollY = 0; // Top of world
+    const maxScrollY = 0;
 
     if (cam.scrollY > maxScrollY) {
       const dy = (this.cameraSettings.runSpeed * delta) / 1000;
@@ -272,66 +242,65 @@ export default class FieldPreviewScene extends Phaser.Scene {
     const cam = this.cameras.main;
     const { height } = this.sys.game.config;
 
-    // If player is moving to target, let the Player class handle it
     if (this.player.isMovingToTarget()) {
       return;
     }
 
-    // Keep player at fixed position relative to camera
     if (this.shootingTarget.isSet) {
       const distanceToTarget = Math.abs(this.shootingTarget.y - this.player.y);
 
-      // When close to target, start moving toward exact position
       if (distanceToTarget <= this.cameraSettings.playerBottomOffset) {
         this.player.setTargetPosition(
           this.shootingTarget.x,
           this.shootingTarget.y
         );
 
-        // Stop opponents when getting close
         if (distanceToTarget < 120) {
           this.stopOpponents();
         }
       } else {
-        // Normal movement - keep player relative to camera
         this.player.setPositionRelativeToCamera(cam, height);
       }
     } else {
-      // Fallback - stay relative to camera
       this.player.setPositionRelativeToCamera(cam, height);
     }
 
-    // Clamp player to field boundaries
-    const fieldMargin = this.fieldData.fieldLeft + 40;
-    const minX = fieldMargin;
-    const maxX = this.worldWidth - fieldMargin;
+    // Clamp to field boundaries
+    const pad = this.fieldData.pad || 48;
+    const minX = pad + 40;
+    const maxX = this.worldWidth - pad - 40;
     this.player.clampToBounds(minX, maxX);
   }
 
   updateOpponents() {
-    if (!this.opponents?.getChildren) return;
+    if (!this.opponents) return;
 
     const defaultHoming = 50;
 
     this.opponents.getChildren().forEach((opponent) => {
       if (!opponent.active || !opponent.body) return;
 
+      // Stop if player is ready to shoot
       if (this.player?.isReady()) {
         opponent.body.setVelocity(0, 0);
-        if (opponent.anims?.isPlaying) opponent.anims.pause();
+        if (opponent.anims?.isPlaying) {
+          opponent.anims.pause();
+        }
         return;
       }
 
-      if (!opponent.getData("homing")) {
-        if (opponent.anims?.isPaused) opponent.anims.resume();
+      // Check if opponent should home in on player
+      const shouldHome = opponent.getData("homing");
+      if (!shouldHome) {
+        if (opponent.anims?.isPaused) {
+          opponent.anims.resume();
+        }
         return;
       }
 
       // Calculate homing movement
-      const px = this.player.x;
-      const py = this.player.y;
-      const dx = px - opponent.x;
-      const dy = py - opponent.y;
+      const dx = this.player.x - opponent.x;
+      const dy = this.player.y - opponent.y;
       const dist = Math.hypot(dx, dy) || 1;
 
       const speed = opponent.getData("homingSpeed") || defaultHoming;
@@ -340,15 +309,22 @@ export default class FieldPreviewScene extends Phaser.Scene {
 
       opponent.body.setVelocity(vx, vy);
 
-      if (opponent.anims?.isPaused) opponent.anims.resume();
+      if (opponent.anims?.isPaused) {
+        opponent.anims.resume();
+      }
     });
   }
 
   stopOpponents() {
-    if (!this.opponents?.getChildren) return;
+    if (!this.opponents) return;
 
     this.opponents.getChildren().forEach((opponent) => {
-      if (opponent.body) opponent.body.setVelocity(0);
+      if (opponent.body) {
+        opponent.body.setVelocity(0, 0);
+      }
+      if (opponent.anims?.isPlaying) {
+        opponent.anims.pause();
+      }
     });
   }
 
@@ -361,7 +337,6 @@ export default class FieldPreviewScene extends Phaser.Scene {
   }
 
   reachShootingPosition() {
-    // Stop camera follow and snap camera to show shooting area nicely
     const cam = this.cameras.main;
     cam.stopFollow();
 
@@ -372,37 +347,104 @@ export default class FieldPreviewScene extends Phaser.Scene {
     cam.scrollY = targetScrollY;
     cam.centerOnX(this.shootingTarget.x);
 
-    // Ensure player is exactly at the spot
     this.player.setTargetPosition(this.shootingTarget.x, this.shootingTarget.y);
-    // force immediate settle (optional small tween could be used)
-    this.player.moveTowardsTarget(16); // move a small step so isAtTarget can be true
-
-    // Make player ready (stops movement in the Field scene)
+    this.player.moveTowardsTarget(16);
     this.player.setReadyToShoot();
 
-    // Toast / UI in Field (optional)
-
-    // Fade out FieldPreviewScene camera, then launch ShootScene and pause FieldPreviewScene
+    // Transition to ShootScene
     cam.fadeOut(500, 0, 0, 0);
     cam.once("camerafadeoutcomplete", () => {
-      // Build data to pass to ShootScene:
       const payload = {
-        // world coordinates (so ShootScene can show the player at same visual x)
         playerX: this.player.x,
         playerY: this.player.y,
         playerFlipX: this.player.flipX ?? false,
         playerFrame: this.player.texture.key ?? "player1",
-        shootingTarget: { x: this.shootingTarget.x, y: this.shootingTarget.y },
+        shootingTarget: {
+          x: this.shootingTarget.x,
+          y: this.shootingTarget.y,
+        },
       };
 
-      // Launch ShootScene and pause the FieldPreviewScene so it can be resumed later
-      this.scene.launch("ShootScene", payload);
-      this.scene.pause(); // pause this scene's update loop
+      // Stop and destroy this scene, launch ShootScene
+      this.scene.stop();
+      this.scene.start("ShootScene", payload);
     });
   }
 
   handlePlayerHit(player, opponent) {
-    // Handle collision between player and opponents
-    return;
+    if (this.gameOver) return;
+
+    // Game over - player lost the ball
+    this.gameOver = true;
+
+    // Freeze everything
+    this.physics.pause();
+
+    // Stop all animations
+    if (player.anims?.isPlaying) {
+      player.anims.pause();
+    }
+
+    this.opponents.getChildren().forEach((opp) => {
+      if (opp.anims?.isPlaying) {
+        opp.anims.pause();
+      }
+    });
+
+    // Stop camera movement
+    this.cameras.main.stopFollow();
+
+    // Flash screen red
+    this.cameras.main.flash(200, 255, 0, 0, false);
+
+    // Show "LOST BALL!" text briefly
+    const { width, height } = this.sys.game.config;
+    const cam = this.cameras.main;
+
+    const lostText = this.add
+      .text(width / 2, height / 2, "LOST BALL!", {
+        font: "bold 72px Arial",
+        fill: "#ff0000",
+        stroke: "#000",
+        strokeThickness: 6,
+      })
+      .setOrigin(0.5)
+      .setDepth(10000)
+      .setScrollFactor(0);
+
+    // Fade to black and transition to GameOver scene
+    this.time.delayedCall(1000, () => {
+      this.cameras.main.fadeOut(500, 0, 0, 0);
+
+      this.cameras.main.once("camerafadeoutcomplete", () => {
+        // Stop and destroy this scene, go to GameOver
+        this.scene.stop();
+        this.scene.start("GameOverScene", {
+          message: "You lose",
+          reason: "You lost the ball.",
+        });
+      });
+    });
+  }
+
+  shutdown() {
+    // Clean up when scene is stopped
+    if (this.player) {
+      this.player.destroy();
+      this.player = null;
+    }
+
+    if (this.opponents) {
+      this.opponents.clear(true, true);
+      this.opponents = null;
+    }
+
+    if (this.keeper) {
+      this.keeper.destroy();
+      this.keeper = null;
+    }
+
+    this.cursors = null;
+    this.fieldData = null;
   }
 }

@@ -1,4 +1,9 @@
-import { gameEndDiv, gameWinLoseSpan, gameEndScore, canvas } from "../main.js";
+import {
+  gameEndDiv,
+  gameWinLoseSpan,
+  gameWinLoseReason,
+  canvas,
+} from "../main.js";
 
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -6,15 +11,16 @@ export default class GameOverScene extends Phaser.Scene {
   }
 
   init(data) {
-    const { scored } = data;
-    this.scored = scored;
+    console.log(data);
+    const { message, reason } = data;
+    this.message = message;
+    this.reason = reason;
   }
 
   create() {
     this.scene.stop("ShotScene");
-    console.log(this.scored);
-
-    gameWinLoseSpan.textContent = this.scored ? "Win!" : "Lose!";
+    gameWinLoseSpan.textContent = this.message;
+    gameWinLoseReason.textContent = this.reason;
     gameEndDiv.style.display = "flex";
     canvas.style.display = "none";
   }

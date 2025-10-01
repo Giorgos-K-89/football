@@ -7,26 +7,8 @@ export default class ShootScene extends Phaser.Scene {
   }
 
   preload() {
-    // Player
-    this.load.image("player1", "assets/player1-1.png");
-    this.load.image("player2", "assets/player1-2.png");
-    this.load.image("shoot1", "assets/shoot1-1.png");
-    this.load.image("shoot2", "assets/shoot1-2.png");
-    // Keeper
-    this.load.image("keeper1", "assets/keeper1-1.png");
-    this.load.image("keeper2", "assets/keeper1-2.png");
-    // Ball and overlay video
     this.load.image("ball", "assets/ball.png");
-    this.load.video(
-      "ballkickingVideo",
-      "assets/cropedfootball.mp4",
-      "loaded",
-      false,
-      true
-    );
-    //goalpost
     this.load.image("goalpost", "assets/goalpost.png");
-    //arrow
     this.load.image("arrow", "assets/pointer.png");
   }
 
@@ -104,6 +86,7 @@ export default class ShootScene extends Phaser.Scene {
       Math.max(botLeft, botRight) - Math.round(this.scale.width * 0.03);
 
     // ================ AIMING ================
+    this.aimArrow = null;
     this.aim = {
       active: true,
       timer: 0,
@@ -399,7 +382,8 @@ export default class ShootScene extends Phaser.Scene {
       2000,
       () => {
         this.scene.start("GameOverScene", {
-          scored: !caught,
+          message: caught ? "You lose" : "You Win!",
+          reason: caught ? "Saved by the keeper." : "Amazing GOAL!",
         });
       },
       [],
