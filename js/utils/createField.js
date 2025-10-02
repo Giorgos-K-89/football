@@ -369,7 +369,7 @@ function drawCenterLineAndCircle(g, field, config) {
 
 function drawPenaltyBoxes(g, field, config) {
   const boxW = Math.round(field.width / 1.6);
-  const boxH = Math.round(field.height / 6);
+  const boxH = Math.round(field.height / 8);
   const smallBoxW = Math.round(field.width * 0.35);
   const smallBoxH = Math.round(field.height / 18);
   const cx = Math.round(config.worldWidth / 2);
@@ -390,7 +390,7 @@ function drawPenaltyBoxes(g, field, config) {
   // Top penalty arc
   const arcDegrees = 100;
   const halfAngleRad = (arcDegrees * Math.PI) / 180 / 2;
-  const topArcCenterY = topBoxY + boxH - 160;
+  const topArcCenterY = topBoxY + boxH - 120;
   g.beginPath();
   g.arc(
     cx,
@@ -418,7 +418,7 @@ function drawPenaltyBoxes(g, field, config) {
   g.fillCircle(cx, penaltySpotBottomY, 3);
 
   // Bottom penalty arc
-  const bottomArcCenterY = bottomBoxY + 160;
+  const bottomArcCenterY = bottomBoxY + 120;
   g.beginPath();
   g.arc(
     cx,

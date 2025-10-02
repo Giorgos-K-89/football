@@ -284,27 +284,20 @@ export default class ShootScene extends Phaser.Scene {
     }
 
     const ball = this.add
-      .image(this.player.x, this.player.y - 10, "ball")
+      .sprite(this.player.x, this.player.y - 10, "ball")
       .setDepth(210)
       .setScale(0.07);
 
-    if (!this.textures.exists("ballTrail")) {
-      const g = this.add.graphics();
-      g.fillStyle(0xfff176, 1);
-      g.fillRect(0, 0, 4, 18);
-      g.generateTexture("__laser", 4, 18);
-      g.destroy();
-    }
-
     // Create ball trail particle emitter
-    const emitter = this.add.particles(ball.x, ball.y, "ballTrail", {
-      speed: { min: 50, max: 100 },
-      scale: { start: 0.8, end: 0 },
-      alpha: { start: 0.8, end: 0 },
-      lifespan: 400,
+    const emitter = this.add.particles(0, 0, "ballTrail", {
+      speed: { min: 20, max: 50 },
+      scale: { start: 1.2, end: 0 },
+      alpha: { start: 0.9, end: 0 },
+      lifespan: 300,
       blendMode: "ADD",
-      frequency: 20,
+      frequency: 15,
       tint: 0xffff00,
+      angle: { min: 0, max: 360 },
     });
 
     emitter.startFollow(ball);
@@ -312,7 +305,7 @@ export default class ShootScene extends Phaser.Scene {
     this.tweens.add({
       targets: ball,
       x: targetX,
-      y: targetY - 24,
+      y: targetY - 104,
       angle: 720,
       duration: 700,
       ease: "Power2",

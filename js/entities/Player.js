@@ -69,6 +69,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.cursors = cursors;
   }
 
+  disableInput() {
+    this.cursors = null;
+  }
+
   setTargetPosition(x, y) {
     this.movement.targetX = x;
     this.movement.targetY = y;
